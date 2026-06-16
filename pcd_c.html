@@ -60,11 +60,10 @@ function calculate() {
     let eccentricity = TIR / 2;
 
     document.getElementById("output").innerHTML = `
-        Mean radius: ${mean.toFixed(3)} mm<br>
         Min: ${min.toFixed(3)} mm<br>
         Max: ${max.toFixed(3)} mm<br>
-        Total Runout (TIR): ${TIR.toFixed(3)} mm<br>
-        Concentricity (eccentricity): ${eccentricity.toFixed(3)} mm<br>
+        Position error (True position) (PW concentricity): ${TIR.toFixed(3)} mm<br>
+
         <br>
         Center Bore: ${centerBore} mm<br>
         PCD: ${pcd} mm
