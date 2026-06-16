@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Wheel Concentricity Calculator</title>
+<style>
+    body { font-family: Arial; padding: 20px; }
+    input { width: 70px; margin: 3px; }
+    .result { margin-top: 15px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h2>Wheel Concentricity Calculator</h2>
+
+<h3>Bore hole measurements (mm)</h3>
+<div id="inputs">
+    <script>
+        for (let i = 0; i < 10; i++) {
+            document.write(`<input type="number" step="0.01" id="m${i}" placeholder="m${i+1}">`);
+        }
+    </script>
+</div>
+
+<h3>Other dimensions</h3>
+<label>Center Bore Diameter:</label>
+<input type="number" id="centerBore"><br><br>
+
+<label>PCD Diameter:</label>
+<input type="number" id="pcd"><br><br>
+
+<button onclick="calculate()">Calculate</button>
+
+<div class="result" id="output"></div>
+
+<script>
+function calculate() {
+    let values = [];
+
+    for (let i = 0; i < 10; i++) {
+        let val = parseFloat(document.getElementById("m" + i).value);
+        if (isNaN(val)) {
+            alert("Please fill all 10 measurements");
+            return;
+        }
+        values.push(val);
+    }
+
+    let centerBore = parseFloat(document.getElementById("centerBore").value);
+    let pcd = parseFloat(document.getElementById("pcd").value);
+
+    let sum = values.reduce((a, b) => a + b, 0);
+    let mean = sum / values.length;
+
+    let min = Math.min(...values);
+    let max = Math.max(...values);
+
+    let TIR = max - min;
+    let eccentricity = TIR / 2;
+
+    document.getElementById("output").innerHTML = `
+        Mean radius: ${mean.toFixed(3)} mm<br>
+        Min: ${min.toFixed(3)} mm<br>
+        Max: ${max.toFixed(3)} mm<br>
+        Total Runout (TIR): ${TIR.toFixed(3)} mm<br>
+        Concentricity (eccentricity): ${eccentricity.toFixed(3)} mm<br>
+        <br>
+        Center Bore: ${centerBore} mm<br>
+        PCD: ${pcd} mm
+    `;
+}
+</script>
+
+</body>
+</html>
