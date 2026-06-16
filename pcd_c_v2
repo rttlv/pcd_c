@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Wheel Concentricity Calculator</title>
+<style>
+    body { font-family: Arial; padding: 20px; }
+    input { width: 80px; margin: 3px; }
+    .result { margin-top: 15px; font-weight: bold; }
+    .pass { color: green; }
+    .fail { color: red; }
+</style>
+</head>
+<body>
+
+<h2>Wheel Concentricity Calculator</h2>
+
+<h3>Bore hole measurements (mm)</h3>
+<div id="inputs">
+<script>
+for (let i = 0; i < 10; i++) {
+    document.write(`<input type="number" step="0.01" id="m${i}" placeholder="Bore${i+1}">`);
+}
+</script>
+</div>
+
+<h3>Other dimensions</h3>
+<label>Center Bore Diameter:</label>
+<input type="number" id="centerBore"><br><br>
+
+<label>PCD Diameter:</label>
+<input type="number" id="pcd"><br><br>
+
+<label>True Position Tolerance (Ø mm):</label>
+<input type="number" id="tolerance" placeholder="e.g. 0.80"><br><br>
+
+<button onclick="calculate()">Calculate</button>
+
+<div class="result" id="output"></div>
+
+<script>
+function calculate() {
+    let values = [];
+
+    for (let i = 0; i < 10; i++) {
+        let val = parseFloat(document.getElementById("m" + i).value);
+        if (isNaN(val)) {
+            alert("Please fill all 10 measurements");
+            return;
+        }
+        values.push(val);
+    }
+
+    let centerBore = parseFloat(document.getElementById("centerBore").value);
+    let pcd = parseFloat(document.getElementById("pcd").value);
+    let tol = parseFloat(document.getElementById("tolerance").value);
+
+    if (isNaN(tol)) {
+        alert("Please enter tolerance");
+        return;
+    }
+
+    let sum = values.reduce((a, b) => a + b, 0);
+    let mean = sum / values.length;
+
+    let min = Math.min(...values);
+    let max = Math.max(...values);
+
+    let TIR = max - min;                  // PolyWorks position equivalent
+    let eccentricity = TIR / 2;          // actual offset
+    let allowedOffset = tol / 2;         // GD&T rule
+
+    // PASS / FAIL
+    let resultText = "";
+    if (TIR <= tol) {
+        resultText = `<span class="pass">✅ PASS</span>`;
+    } else {
+        resultText = `<span class="fail">❌ FAIL</span>`;
+    }
+
+    document.getElementById("output").innerHTML = `
+        Min: ${min.toFixed(3)} mm<br>
+        Max: ${max.toFixed(3)} mm<br>
+
+        <br>
+        Position error (True position): ${TIR.toFixed(3)} mm<br>
+        Concentricity (offset): ${eccentricity.toFixed(3)} mm<br>
+
+        <br>
+        Tolerance (Ø): ${tol.toFixed(3)} mm<br>
+        Allowed offset (radius): ±${allowedOffset.toFixed(3)} mm<br>
+
+        <br>
+        Result: ${resultText}
+
+        <br><br>
+        Center Bore: ${centerBore} mm<br>
+        PCD: ${pcd} mm
+    `;
+}
+</script>
+
+</body>
+</html>
+``
