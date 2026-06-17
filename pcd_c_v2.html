@@ -1,102 +1,306 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Wheel Concentricity Calculator</title>
+<title>Riteņa PCD koncentriskuma kalkulators</title>
+
 <style>
-    body { font-family: Arial; padding: 20px; }
-    input { width: 80px; margin: 3px; }
-    .result { margin-top: 15px; font-weight: bold; }
-    .pass { color: green; }
-    .fail { color: red; }
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        max-width: 950px;
+        line-height: 1.4;
+    }
+
+    input {
+        width: 90px;
+        margin: 3px;
+        padding: 4px;
+    }
+
+    button {
+        padding: 6px 12px;
+        cursor: pointer;
+    }
+
+    .result {
+        margin-top: 20px;
+        padding: 15px;
+        border: 1px solid #ccc;
+        background: #f7f7f7;
+        font-weight: bold;
+    }
+
+    .note {
+        font-size: 0.95em;
+        color: #444;
+        margin-bottom: 15px;
+    }
+
+    .headline {
+        padding: 12px;
+        margin: 10px 0 16px 0;
+        border-radius: 4px;
+        font-size: 1.15em;
+        font-weight: bold;
+    }
+
+    .headline-pass {
+        border: 2px solid green;
+        background: #eef9ee;
+        color: green;
+    }
+
+    .headline-fail {
+        border: 2px solid red;
+        background: #fff0f0;
+        color: red;
+    }
+
+    table {
+        border-collapse: collapse;
+        margin-top: 10px;
+        margin-bottom: 15px;
+        font-size: 0.95em;
+    }
+
+    th, td {
+        border: 1px solid #ccc;
+        padding: 6px 10px;
+        text-align: center;
+    }
+
+    th {
+        background: #eee;
+    }
 </style>
 </head>
+
 <body>
 
-<h2>Wheel Concentricity Calculator</h2>
+<h2>Riteņa PCD koncentriskuma kalkulators</h2>
 
-<h3>Bore hole measurements (mm)</h3>
+<p class="note">
+    Šis kalkulators veic divas atsevišķas pārbaudes:
+    <br><br>
+    <strong>Attāluma aprēķins</strong> — aprēķina paredzamo materiāla atstarpi starp centra urbumu un skrūvju urbumiem.
+    <br>
+    <strong>PCD koncentriskuma novērtējums</strong> — salīdzina pretējo atstarpju mērījumus, lai novērtētu PCD pozīcijas novirzi.
+</p>
+
+<h3>Attāluma mērījumi: attālums no centra urbuma malas līdz skrūvju urbuma malai (mm).</h3>
+
+<p class="note">
+    Ievadiet 10 attāluma mērījumus secībā pa visu PCD apkārtmēru.
+</p>
+
 <div id="inputs">
 <script>
 for (let i = 0; i < 10; i++) {
-    document.write(`<input type="number" step="0.01" id="m${i}" placeholder="Bore${i+1}">`);
+    document.write(`<input type="text" inputmode="decimal" id="m${i}" placeholder="Gap ${i + 1}">`);
 }
 </script>
 </div>
 
-<h3>Other dimensions</h3>
-<label>Center Bore Diameter:</label>
-<input type="number" id="centerBore"><br><br>
+<h3>Rasējuma / nominālie izmēri</h3>
 
-<label>PCD Diameter:</label>
-<input type="number" id="pcd"><br><br>
+<label>Centra urbuma diametrs:</label>
+<input type="text" inputmode="decimal" id="centerBore" placeholder="piem., 281"><br><br>
 
-<label>True Position Tolerance (Ø mm):</label>
-<input type="number" id="tolerance" placeholder="e.g. 0.80"><br><br>
+<label>PCD diametrs:</label>
+<input type="text" inputmode="decimal" id="pcd" placeholder="piem., 335"><br><br>
 
-<button onclick="calculate()">Calculate</button>
+<label>Skrūvju urbuma diametrs:</label>
+<input type="text" inputmode="decimal" id="boltHole" placeholder="piem., 23,5"><br><br>
 
-<div class="result" id="output"></div>
+<label>Pozīcijas / koncentriskuma pielaide Ø:</label>
+<input type="text" inputmode="decimal" id="tolerance" placeholder="piem., 0,8"><br><br>
+
+<button onclick="calculate()">Aprēķināt</button>
+
+<div class="result" id="output">
+    Aizpildiet visus mērījumus un izmērus, pēc tam nospiediet “Aprēķināt”.
+</div>
 
 <script>
+function parseDecimalInput(id) {
+    let raw = document.getElementById(id).value.trim();
+
+    if (raw === "") {
+        return NaN;
+    }
+
+    let normalized = raw
+        .replace(/\s/g, "")
+        .replace(/,/g, ".");
+
+    return Number(normalized);
+}
+
 function calculate() {
     let values = [];
 
     for (let i = 0; i < 10; i++) {
-        let val = parseFloat(document.getElementById("m" + i).value);
+        let val = parseDecimalInput("m" + i);
+
         if (isNaN(val)) {
-            alert("Please fill all 10 measurements");
+            alert("Please fill all 10 gap measurements.");
             return;
         }
+
         values.push(val);
     }
 
-    let centerBore = parseFloat(document.getElementById("centerBore").value);
-    let pcd = parseFloat(document.getElementById("pcd").value);
-    let tol = parseFloat(document.getElementById("tolerance").value);
+    let centerBore = parseDecimalInput("centerBore");
+    let pcd = parseDecimalInput("pcd");
+    let boltHole = parseDecimalInput("boltHole");
+    let tol = parseDecimalInput("tolerance");
 
-    if (isNaN(tol)) {
-        alert("Please enter tolerance");
+    if (isNaN(centerBore)) {
+        alert("Please enter the centre bore diameter.");
         return;
     }
+
+    if (isNaN(pcd)) {
+        alert("Please enter the PCD diameter.");
+        return;
+    }
+
+    if (isNaN(boltHole)) {
+        alert("Please enter the bolt hole diameter.");
+        return;
+    }
+
+    if (isNaN(tol)) {
+        alert("Please enter the true position / concentricity tolerance.");
+        return;
+    }
+
+    // -----------------------------
+    // 1. GAP CALCULATION
+    // -----------------------------
+    // This checks the expected material gap between the centre bore edge
+    // and the bolt-hole edge.
+    // It does not prove PCD concentricity.
+
+    let nominalGap = (pcd - centerBore - boltHole) / 2;
+
+    // -----------------------------
+    // 2. MEASURED GAP SUMMARY
+    // -----------------------------
 
     let sum = values.reduce((a, b) => a + b, 0);
     let mean = sum / values.length;
 
     let min = Math.min(...values);
     let max = Math.max(...values);
+    let totalGapSpread = max - min;
 
-    let TIR = max - min;                  // PolyWorks position equivalent
-    let eccentricity = TIR / 2;          // actual offset
-    let allowedOffset = tol / 2;         // GD&T rule
+    // -----------------------------
+    // 3. OPPOSITE PAIR CHECK
+    // -----------------------------
+    // The main pass/fail check compares:
+    // Largest opposite-pair difference vs drawing Ø tolerance.
 
-    // PASS / FAIL
-    let resultText = "";
-    if (TIR <= tol) {
-        resultText = `<span class="pass">✅ PASS</span>`;
-    } else {
-        resultText = `<span class="fail">❌ FAIL</span>`;
-    }
+    let pairs = [
+        { pair: "Attālums 1 vs Attālums 6", a: values[0], b: values[5] },
+        { pair: "Attālums 2 vs Attālums 7", a: values[1], b: values[6] },
+        { pair: "Attālums 3 vs Attālums 8", a: values[2], b: values[7] },
+        { pair: "Attālums 4 vs Attālums 9", a: values[3], b: values[8] },
+        { pair: "Attālums 5 vs Attālums 10", a: values[4], b: values[9] }
+    ];
+
+    let pairResults = pairs.map(p => {
+        let difference = Math.abs(p.a - p.b);
+
+        return {
+            pair: p.pair,
+            gapA: p.a,
+            gapB: p.b,
+            difference: difference
+        };
+    });
+
+    let largestPairDifference = Math.max(...pairResults.map(p => p.difference));
+    let worstPair = pairResults.find(p => p.difference === largestPairDifference);
+
+    let isPass = largestPairDifference <= tol;
+    let halfConcentricityTolerance = tol / 2;
+    let lowerGapLimit = nominalGap - halfConcentricityTolerance;
+    let upperGapLimit = nominalGap + halfConcentricityTolerance;
+
+    let headlineClass = isPass ? "headline headline-pass" : "headline headline-fail";
+
+    let headlineText = `
+        Manuāli novērtētā Ø pozīcijas kļūda:
+        ${largestPairDifference.toFixed(2)} mm
+        pret pielaidi Ø ${tol.toFixed(1)} mm —
+        ${isPass ? "OK" : "NOK"}
+    `;
+
+    let pairTable = `
+        <table>
+            <tr>
+                <th>Pretējais pāris</th>
+                <th>Attālums A</th>
+                <th>Attālums B</th>
+                <th>Starpība<br>|A - B|</th>
+            </tr>
+    `;
+
+    pairResults.forEach(p => {
+        pairTable += `
+            <tr>
+                <td>${p.pair}</td>
+                <td>${p.gapA.toFixed(2)} mm</td>
+                <td>${p.gapB.toFixed(2)} mm</td>
+                <td>${p.difference.toFixed(2)} mm</td>
+            </tr>
+        `;
+    });
+
+    pairTable += `</table>`;
 
     document.getElementById("output").innerHTML = `
-        Min: ${min.toFixed(3)} mm<br>
-        Max: ${max.toFixed(3)} mm<br>
+        <h3>Attāluma aprēķins</h3>
 
-        <br>
-        Position error (True position): ${TIR.toFixed(3)} mm<br>
-        Concentricity (offset): ${eccentricity.toFixed(3)} mm<br>
+        Nominālais attālums starp skrūvju urbuma malu un centra urbuma malu:<br>
+        (${pcd.toFixed(2)} - ${centerBore.toFixed(2)} - ${boltHole.toFixed(1)}) / 2
+        = <strong>${nominalGap.toFixed(2)} mm</strong><br>
+        (Kopējā koncentriskuma pielaide Ø ${tol.toFixed(1)} mm / 2
+        = <strong>${halfConcentricityTolerance.toFixed(1)} mm</strong>)<br><br>
 
-        <br>
-        Tolerance (Ø): ${tol.toFixed(3)} mm<br>
-        Allowed offset (radius): ±${allowedOffset.toFixed(3)} mm<br>
-
-        <br>
-        Result: ${resultText}
+        Pieļaujamā attāluma robežas:<br>
+        ${nominalGap.toFixed(2)} mm ± ${halfConcentricityTolerance.toFixed(1)} mm
+        = <strong>${lowerGapLimit.toFixed(2)} mm līdz ${upperGapLimit.toFixed(2)} mm</strong>
 
         <br><br>
-        Center Bore: ${centerBore} mm<br>
-        PCD: ${pcd} mm
+        Šis ir teorētiski paredzamais materiāla attālums starp centra urbuma malu un skrūvju urbuma malu.
+		Tas ir noderīgs iekārtas iestatīšanai un attāluma pārbaudei, taču tas pats par sevi nepierāda PCD koncentriskumu.
+
+        <h3>Nomērītā attāluma kopsavilkums</h3>
+
+        Mazākas nomērītais attālums: ${min.toFixed(2)} mm<br>
+        Lielākas nomērītais attālums: ${max.toFixed(2)} mm<br>
+        Vidējais nomērītais attālums: ${mean.toFixed(2)} mm<br>
+        Kopējais attāluma diapazons, max - min: ${totalGapSpread.toFixed(2)} mm<br>
+
+        <h3>Manuāls PCD koncentriskuma novērtējums</h3>
+
+        ${pairTable}
+
+        <div class="${headlineClass}">
+            ${headlineText}
+        </div>
+
+        Sliktākais pretējais pāris:
+        <strong>${worstPair.pair}</strong><br>
+
+        Lielākā pretējā pāra starpība:
+        <strong>${largestPairDifference.toFixed(2)} mm</strong><br>
+
+        Rasējuma pielaide Ø:
+        <strong>${tol.toFixed(1)} mm</strong>
     `;
 }
 </script>
