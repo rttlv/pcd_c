@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Riteņa PCD koncentriskuma kalkulators</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diska PCD koncentriskuma kalkulators</title>
 
 <style>
     body {
@@ -73,12 +74,86 @@
     th {
         background: #eee;
     }
+
+
+    @media (max-width: 600px) {
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            padding: 12px;
+            max-width: none;
+            width: 100%;
+            margin: 0;
+        }
+
+        h2 {
+            font-size: 1.35em;
+        }
+
+        h3 {
+            font-size: 1.05em;
+        }
+
+        input {
+            width: 100%;
+            max-width: 100%;
+            margin: 6px 0 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        #inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        #inputs input {
+            width: 100%;
+            margin: 0;
+        }
+
+        label {
+            display: block;
+            margin-top: 8px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+        }
+
+        .result {
+            overflow-x: auto;
+            padding: 12px;
+        }
+
+        table {
+            width: max-content;
+            min-width: 100%;
+            font-size: 0.9em;
+        }
+
+        th, td {
+            padding: 6px 8px;
+        }
+
+        .headline {
+            font-size: 1em;
+            padding: 10px;
+            overflow-wrap: anywhere;
+        }
+    }
+
 </style>
 </head>
 
 <body>
 
-<h2>Riteņa PCD koncentriskuma kalkulators</h2>
+<h2>Diska PCD koncentriskuma kalkulators</h2>
 
 <p class="note">
     Šis kalkulators veic divas atsevišķas pārbaudes:
